@@ -13,10 +13,10 @@ st.markdown("Cette application utilise un large modèle de langage (LLM) de la f
 
 st.subheader("Analyse exploratoire")
 
-def load_data():
-    return pd.read_csv("selected_df.csv")
+def load_data(path):
+    return pd.read_csv(path)
 
-data = load_data()
+data = load_data("selected_df.csv")
 data = data[["Title", "Text", 'Len_text', 'Len_title']]
 st.write(data.head(5))
 
@@ -48,6 +48,12 @@ st.image(wordcloud.to_array(), use_column_width=True)
 #plt.axis('off')
 #plt.title("Nuage de mots du texte")
 #st.pyplot()
+
+st.subheader("Comparaison des perfomances des modèles")
+st.subheader("Llama 13B - Mistral 7B - StableLM Zephyr 1.6B")
+
+df_results = load_data("results_df.csv")
+st.write(df_results)
 
 st.title("Génération de titre avec StableLM2 Zephyr 1.6B ")
 # Saisie de données et prédiction
