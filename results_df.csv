@@ -1,0 +1,4 @@
+,Mean Levenshtein,Mean Cosine,Mean BLEU,Mean ROUGE-1,Mean ROUGE-L
+Llama_13B,0.35,0.29,0.17,0.4,0.36
+Mistral_7B,0.29,0.24,0.16,0.33,0.29
+StableLM_1.6B,0.33,0.3,0.23,0.39,0.34
