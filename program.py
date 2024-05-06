@@ -49,7 +49,7 @@ st.image(wordcloud.to_array(), use_column_width=True)
 #plt.title("Nuage de mots du texte")
 #st.pyplot()
 
-st.title("StableLM2 Zephyr 1.6B Title Prediction")
+st.title("Génération de titre avec StableLM2 Zephyr 1.6B ")
 # Saisie de données et prédiction
 gen_config = {
     "temperature": 0.1,
@@ -59,25 +59,18 @@ gen_config = {
     "do_sample": True,
     "max_new_tokens": 30,
     }
+
+modelpath="stabilityai/stablelm-2-zephyr-1_6b"
+
+tokenizer = AutoTokenizer.from_pretrained(modelpath, trust_remote_code=True, use_fast=False,) 
+model = AutoModelForCausalLM.from_pretrained(modelpath, torch_dtype=torch.bfloat16, device_map="cpu", trust_remote_code=True,)
+quantize(model, weights=torch.int8, activations=None)
+freeze(model)
     
 text_input = st.text_area("Entrer le texte:", "")
 
-if st.button("Generate Title"):
-	modelpath="stabilityai/stablelm-2-zephyr-1_6b"
 
-	tokenizer = AutoTokenizer.from_pretrained(modelpath, trust_remote_code=True, use_fast=False,) 
-	model = AutoModelForCausalLM.from_pretrained(
-	    modelpath,    
-	    torch_dtype=torch.bfloat16,
-	    device_map="cpu",
-	    #attn_implementation="flash_attention_2",
-	    trust_remote_code=True,       # needed for Stable LM 2 based models
-	)
-	quantize(model, weights=torch.int8, activations=None)
-	freeze(model)
-
-
-
+if st.button("Générer un titre"):
 	question = f"Generate an appropriate title to the following text in a maximum of 10 words. Do not provide explanations or justifications. Make sure the answer contains only the title in this format 'title' : {text_input}"
 	messages = [{"role": "user", "content": question}]
 	input_tokens = tokenizer.apply_chat_template(messages, return_tensors="pt", add_generation_prompt=True).to("cpu")
