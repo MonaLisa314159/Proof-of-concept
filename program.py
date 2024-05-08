@@ -76,8 +76,7 @@ tokenizer = AutoTokenizer.from_pretrained(modelpath, trust_remote_code=True, use
 #model = AutoModelForCausalLM.from_pretrained(modelpath, torch_dtype=torch.bfloat16, device_map="cpu", trust_remote_code=True,)
 #quantize(model, weights=torch.int8, activations=None)
 #freeze(model)
-#my_token = os.getenv("TOKEN")
-my_token = "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"
+my_token = os.getenv("TOKEN")
 client = InferenceClient(model=modelpath, token=my_token)  
 text_input = st.text_area("Entrer le texte:", "")
 
