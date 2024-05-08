@@ -57,8 +57,8 @@ st.image(wordcloud.to_array(), use_column_width=True)
 st.subheader("Comparaison des perfomances")
 st.subheader("Llama 13B - Mistral 7B - StableLM Zephyr 1.6B")
 
-#df_results = load_data("results_df.csv")
-#st.write(df_results)
+df_results = pd.read_csv("results_df.csv", index_col=["Unnamed: 0"])
+st.write(df_results)
 
 st.title("Génération de titre avec StableLM2 Zephyr 1.6B ")
 # Saisie de données et prédiction
