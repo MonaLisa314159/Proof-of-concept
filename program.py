@@ -1,12 +1,17 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
+#import numpy as np
 from wordcloud import WordCloud
 import matplotlib.pyplot as plt
-from transformers import AutoTokenizer, AutoModelForCausalLM
-import torch
-from quanto import quantize, freeze
+from transformers import AutoTokenizer
+#from transformers import AutoModelForCausalLM
+#import torch
+#from quanto import quantize, freeze
+from huggingface_hub import InferenceClient
+from dotenv import load_dotenv
+import os
 
+load_dotenv()
 st.title("Application de génération de titre")
 st.markdown("Cette application utilise un large modèle de langage (LLM) de la famille StableLM (StableL2-Zephyr-1.6B) pour générer un titre à partir d'un texte donné.")
 
@@ -49,11 +54,11 @@ st.image(wordcloud.to_array(), use_column_width=True)
 #plt.title("Nuage de mots du texte")
 #st.pyplot()
 
-st.subheader("Comparaison des perfomances des modèles")
+st.subheader("Comparaison des perfomances")
 st.subheader("Llama 13B - Mistral 7B - StableLM Zephyr 1.6B")
 
-df_results = load_data("results_df.csv")
-st.write(df_results)
+#df_results = load_data("results_df.csv")
+#st.write(df_results)
 
 st.title("Génération de titre avec StableLM2 Zephyr 1.6B ")
 # Saisie de données et prédiction
@@ -67,22 +72,26 @@ gen_config = {
     }
 
 modelpath="stabilityai/stablelm-2-zephyr-1_6b"
-
 tokenizer = AutoTokenizer.from_pretrained(modelpath, trust_remote_code=True, use_fast=False,) 
-model = AutoModelForCausalLM.from_pretrained(modelpath, torch_dtype=torch.bfloat16, device_map="cpu", trust_remote_code=True,)
-quantize(model, weights=torch.int8, activations=None)
-freeze(model)
-    
+#model = AutoModelForCausalLM.from_pretrained(modelpath, torch_dtype=torch.bfloat16, device_map="cpu", trust_remote_code=True,)
+#quantize(model, weights=torch.int8, activations=None)
+#freeze(model)
+my_token = os.getenv("TOKEN")
+client = InferenceClient(model=modelpath, token=my_token)  
 text_input = st.text_area("Entrer le texte:", "")
 
 
 if st.button("Générer un titre"):
-	question = f"Generate an appropriate title to the following text in a maximum of 10 words. Do not provide explanations or justifications. Make sure the answer contains only the title in this format 'title' : {text_input}"
-	messages = [{"role": "user", "content": question}]
-	input_tokens = tokenizer.apply_chat_template(messages, return_tensors="pt", add_generation_prompt=True).to("cpu")
-	with torch.no_grad():
-		output_tokens = model.generate(input_tokens, **gen_config, pad_token_id=tokenizer.eos_token_id,)
-	output_tokens = output_tokens[0][len(input_tokens[0]):]
-	output = tokenizer.decode(output_tokens, skip_special_tokens=True)
-	st.subheader("Titre généré :")
-	st.write(output)
+	#question = f"Generate an appropriate title to the following text in a maximum of 10 words. Do not provide explanations or justifications. Make sure the answer contains only the title in this format 'title' : {text_input}"
+	#messages = [{"role": "user", "content": question}]
+	#input_tokens = tokenizer.apply_chat_template(messages, return_tensors="pt", add_generation_prompt=True).to("cpu")
+#	with torch.no_grad():
+#		output_tokens = model.generate(input_tokens, **gen_config, pad_token_id=tokenizer.eos_token_id,)
+#	output_tokens = output_tokens[0][len(input_tokens[0]):]
+#	output = tokenizer.decode(output_tokens, skip_special_tokens=True)
+    question = f"Generate an appropriate title to the following text: {text_input}"
+    messages = [{"role": "user", "content": question}]
+    prompt = tokenizer.apply_chat_template(messages, tokenize=False)
+    output = client.text_generation(prompt, temperature=0.1, max_new_tokens=30)
+    st.subheader("Titre généré :")
+    st.write(output)
