@@ -77,10 +77,7 @@ tokenizer = AutoTokenizer.from_pretrained(modelpath, trust_remote_code=True, use
 #quantize(model, weights=torch.int8, activations=None)
 #freeze(model)
 #my_token = os.getenv("TOKEN")
-st.write(
-    "Has environment variables been set:",
-    os.environ["TOKEN"] == st.secrets["TOKEN"],
-)
+
 my_token = st.secrets["TOKEN"]
 client = InferenceClient(model=modelpath, token=my_token)  
 text_input = st.text_area("Entrer le texte:", "")
