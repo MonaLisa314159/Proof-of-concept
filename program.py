@@ -74,7 +74,7 @@ text_input = st.text_area("Entrer le texte:", "")
 
 
 if st.button("Générer un titre"):
-    question = f"Generate an appropriate title to the following text. Do not provide justification or explanation: {text_input}.  Make sure the answer contains only the title"
+    question = f"Generate an appropriate title to the following text. Do not provide justification or explanation. Make sure the answer contains only the title in this format 'Title' : {text_input}"
     messages = [{"role": "user", "content": question}]
     prompt = tokenizer.apply_chat_template(messages, tokenize=False)
     output = client.text_generation(prompt, 
